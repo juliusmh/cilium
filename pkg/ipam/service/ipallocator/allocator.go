@@ -68,13 +68,21 @@ type Range struct {
 // the backing store.
 func NewCIDRRange(cidr *net.IPNet) *Range {
 	base := bigForIP(cidr.IP)
-	max := maximum(0, int(RangeSize(cidr)-2)) // don't use the network broadcast,
+	size := RangeSize(cidr)
+
+	// for any CIDR other than /32 or /128:
+	if size > 1 {
+		// don't use the network broadcast
+		size = max(0, size-2)
+		// don't use the network base
+		base = base.Add(base, big.NewInt(1))
+	}
 
 	return &Range{
 		net:   cidr,
-		base:  base.Add(base, big.NewInt(1)), // don't use the network base
-		max:   max,
-		alloc: allocator.NewAllocationMap(int(max), cidr.String()),
+		base:  base,
+		max:   int(size),
+		alloc: allocator.NewAllocationMap(int(size), cidr.String()),
 	}
 }
 

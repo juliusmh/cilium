@@ -71,6 +71,13 @@ func addrsInPrefix(p netip.Prefix) *big.Int {
 	// compute number of addresses in prefix, i.e. 2^bits
 	addrs := new(big.Int)
 	addrs.Lsh(big.NewInt(1), uint(p.Addr().BitLen()-p.Bits()))
+
+	// this is a /32 or /128 pool
+	one := big.NewInt(1)
+	if addrs.Cmp(one) == 0 {
+		return one
+	}
+
 	// subtract network and broadcast address, which are not available for
 	// allocation in the cilium/ipam library for now
 	addrs.Sub(addrs, big.NewInt(2))
