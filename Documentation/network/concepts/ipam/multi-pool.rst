@@ -71,7 +71,10 @@ New pools can be added at run-time. The list of CIDRs in each pool can also be
 extended at run-time. In-use CIDRs may not be removed from an existing pool, and
 existing pools may not be deleted if they are still in use by a Cilium node.
 The mask size of a pool is immutable and the same for all nodes. Neither restriction
-is enforced until :gh-issue:`26966` is resolved.
+is enforced until :gh-issue:`26966` is resolved. The first and last address of a
+`CiliumPodIPPool` are reserved and cannot be allocated. A pool with /32 or /128 mask
+does not have this limitation.
+
 
 Configuration
 *************
